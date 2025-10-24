@@ -1,6 +1,7 @@
 import express from 'express';
 import * as trpcExpress from '@trpc/server/adapters/express';
 import { trpcRouter } from './trpc';
+import cors from 'cors';
 
 const ideas = [
   { nick: 'nick-1', name: 'Idea 1', description: 'Description of idea 1' },
@@ -11,6 +12,7 @@ const ideas = [
 ];
 
 const expressApp = express();
+expressApp.use(cors());
 expressApp.get('/ping', (req, res) => {
   res.send('pong');
 });
