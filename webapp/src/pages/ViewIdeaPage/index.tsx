@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 
 export const ViewIdeaPage = () => {
-  const { ideaNick } = useParams() as { ideaNick: string }; // разобраться с этой строкой (useParams)
+  const { ideaNick } = useParams() as { ideaNick: string };
   return (
     <div>
       <h1>{ideaNick}</h1>
