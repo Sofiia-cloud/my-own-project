@@ -1,4 +1,5 @@
 import { useFormik } from 'formik';
+import { useState } from 'react';
 
 import { Input } from '../../components/Input';
 import { Segment } from '../../components/Segment';
@@ -6,6 +7,8 @@ import { Textarea } from '../../components/Textarea';
 import { trpc } from '../../lib/trpc';
 
 export const NewIdeaPage = () => {
+  const [successMessageVisible, setSuccessMessageVisible] = useState(false);
+  const [submittingError, setSubmittingError] = useState<null | string>(null);
   const createIdea = trpc.createIdea.useMutation();
   const formik = useFormik({
     initialValues: {
@@ -35,7 +38,19 @@ export const NewIdeaPage = () => {
       return errors;
     },
     onSubmit: async (values) => {
-      await createIdea.mutateAsync(values);
+      try {
+        await createIdea.mutateAsync(values);
+        formik.resetForm();
+        setSuccessMessageVisible(true);
+        setTimeout(() => {
+          setSuccessMessageVisible(false);
+        }, 3000);
+      } catch (error: any) {
+        setSubmittingError(error.message);
+        setTimeout(() => {
+          setSubmittingError(null);
+        }, 3000);
+      }
     },
   });
 
@@ -54,7 +69,13 @@ export const NewIdeaPage = () => {
         {!formik.isValid && !!formik.submitCount && (
           <div style={{ color: 'red', marginBottom: '10px' }}>Some fields are invalid</div>
         )}
-        <button type="submit">Create Idea</button>
+        {!!submittingError && <div style={{ color: 'red', marginBottom: '10px' }}>{submittingError}</div>}
+        {successMessageVisible && (
+          <div style={{ color: 'green', marginBottom: '10px' }}>Idea created successfully!</div>
+        )}
+        <button type="submit" disabled={formik.isSubmitting}>
+          {formik.isSubmitting ? 'Sending...' : 'Create Idea'}
+        </button>
       </form>
     </Segment>
   );
